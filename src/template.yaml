@@ -17,7 +17,7 @@ Metadata:
     SpdxLicenseId: MIT
     LicenseUrl: ../LICENSE
     ReadmeUrl: ../README.md
-    Labels: ['cloudfront', 'whitelist', 'security group']
+    Labels: ['cloudfront', 'whitelist', 'securitygroup']
     HomePageUrl: https://github.com/altrdev/cloudfront_security_group_update_ips
     SemanticVersion: 0.0.1
     SourceCodeUrl: https://github.com/altrdev/cloudfront_security_group_update_ips
