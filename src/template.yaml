@@ -1,0 +1,110 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Resources for update Cloudfront whitelist IPs
+Parameters:
+  Protocol:
+    Type: String
+    AllowedValues:
+      - "http"
+      - "https"
+
+Resources:
+  CloudfrontSecurityGroupGlobal:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: cloudfront_ips_whitelist_g
+      GroupDescription: Cloudfront IPs whitelist
+      Tags:
+        - Key: Name
+          Value: "cloudfront_g"
+        - Key: AutoUpdate
+          Value: "true"
+        - Key: Protocol
+          Value: !Ref Protocol
+
+  CloudfrontSecurityGroupRegional:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "cloudfront_ips_whitelist_r"
+      GroupDescription: "Cloudfront IPs whitelist"
+      Tags:
+        - Key: Name
+          Value: "cloudfront_r"
+        - Key: AutoUpdate
+          Value: "true"
+        - Key: Protocol
+          Value: !Ref Protocol
+
+  CloudfrontLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "Cloudfront_lambda_ips_whitelist_role"
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+  CloudfrontLambdaPolicy:
+    DependsOn: CloudfrontLambdaRole
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "Cloudfront_lambda_ips_whitelist"
+      Roles:
+        - !Ref CloudfrontLambdaRole
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: "logs:CreateLogGroup"
+            Resource: "arn:aws:logs:*:*:*"
+          - Effect: Allow
+            Action: "logs:CreateLogStream"
+            Resource: "arn:aws:logs:*:*:*"
+          - Effect: Allow
+            Action: "logs:PutLogEvents"
+            Resource: "arn:aws:logs:*:*:*"
+          - Effect: Allow
+            Action: "ec2:DescribeSecurityGroups"
+            Resource: "*"
+          - Effect: Allow
+            Action: "ec2:AuthorizeSecurityGroupIngress"
+            Resource: "*"
+          - Effect: Allow
+            Action: "ec2:RevokeSecurityGroupIngress"
+            Resource: "*"
+
+  CloudfrontLambdaFunction:
+    DependsOn: CloudfrontLambdaRole
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "Cloudfront_lambda_ips_whitelist"
+      Handler: "cloudfront_ips_whitelist.lambda_handler"
+      CodeUri: "./"
+      Timeout: 10
+      Runtime: python2.7
+      Role: Fn::GetAtt: [ CloudfrontLambdaRole, Arn ]
+
+  SNSSubscription:
+    DependsOn: CloudfrontLambdaFunction
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: Fn::GetAtt: [ CloudfrontLambdaFunction, Arn ]
+      Protocol: "lambda"
+      Region: !Ref AWS::Region
+      TopicArn: "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
+
+  LambdaPermission:
+    DependsOn: CloudfrontLambdaFunction
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: Fn::GetAtt: [ CloudfrontLambdaFunction, Arn ]
+      Action: "lambda:InvokeFunction"
+      Principal: "sns.amazonaws.com"
+      SourceArn: "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
