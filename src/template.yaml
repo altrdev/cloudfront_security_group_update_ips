@@ -15,8 +15,8 @@ Metadata:
     Description: Update a security group with cloudfront whitelist IPs
     Author: Alessandro Travi
     SpdxLicenseId: MIT
-    LicenseUrl: LICENSE
-    ReadmeUrl: README.md
+    LicenseUrl: ../LICENSE
+    ReadmeUrl: ../README.md
     Labels: ['cloudfront', 'whitelist', 'security group']
     HomePageUrl: https://github.com/altrdev/cloudfront_security_group_update_ips
     SemanticVersion: 0.0.1
@@ -102,13 +102,13 @@ Resources:
       CodeUri: "./"
       Timeout: 10
       Runtime: python2.7
-      Role: Fn::GetAtt: [ CloudfrontLambdaRole, Arn ]
+      Role: !GetAtt [ CloudfrontLambdaRole, Arn ]
 
   SNSSubscription:
     DependsOn: CloudfrontLambdaFunction
     Type: AWS::SNS::Subscription
     Properties:
-      Endpoint: Fn::GetAtt: [ CloudfrontLambdaFunction, Arn ]
+      Endpoint: !GetAtt [ CloudfrontLambdaFunction, Arn ]
       Protocol: "lambda"
       Region: !Ref AWS::Region
       TopicArn: "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
@@ -117,7 +117,7 @@ Resources:
     DependsOn: CloudfrontLambdaFunction
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: Fn::GetAtt: [ CloudfrontLambdaFunction, Arn ]
+      FunctionName: !GetAtt [ CloudfrontLambdaFunction, Arn ]
       Action: "lambda:InvokeFunction"
       Principal: "sns.amazonaws.com"
       SourceArn: "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
