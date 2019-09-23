@@ -2,13 +2,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Resources for update Cloudfront whitelist IPs
-Parameters:
-  Protocol:
-    Type: String
-    AllowedValues:
-      - "http"
-      - "https"
-
 Metadata:
   AWS::ServerlessRepo::Application:
     Name: cloudfront-security-group-update-ips
@@ -23,32 +16,6 @@ Metadata:
     SourceCodeUrl: https://github.com/altrdev/cloudfront_security_group_update_ips
 
 Resources:
-  CloudfrontSecurityGroupGlobal:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: cloudfront_ips_whitelist_g
-      GroupDescription: Cloudfront IPs whitelist
-      Tags:
-        - Key: Name
-          Value: "cloudfront_g"
-        - Key: AutoUpdate
-          Value: "true"
-        - Key: Protocol
-          Value: !Ref Protocol
-
-  CloudfrontSecurityGroupRegional:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: "cloudfront_ips_whitelist_r"
-      GroupDescription: "Cloudfront IPs whitelist"
-      Tags:
-        - Key: Name
-          Value: "cloudfront_r"
-        - Key: AutoUpdate
-          Value: "true"
-        - Key: Protocol
-          Value: !Ref Protocol
-
   CloudfrontLambdaRole:
     Type: AWS::IAM::Role
     Properties:
