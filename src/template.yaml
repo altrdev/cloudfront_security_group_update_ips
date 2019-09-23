@@ -9,6 +9,19 @@ Parameters:
       - "http"
       - "https"
 
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: cloudfront-security-group-update-ips
+    Description: Update a security group with cloudfront whitelist IPs
+    Author: Alessandro Travi
+    SpdxLicenseId: MIT
+    LicenseUrl: LICENSE
+    ReadmeUrl: README.md
+    Labels: ['cloudfront', 'whitelist', 'security group']
+    HomePageUrl: https://github.com/altrdev/cloudfront_security_group_update_ips
+    SemanticVersion: 0.0.1
+    SourceCodeUrl: https://github.com/altrdev/cloudfront_security_group_update_ips
+
 Resources:
   CloudfrontSecurityGroupGlobal:
     Type: AWS::EC2::SecurityGroup
