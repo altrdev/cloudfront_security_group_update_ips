@@ -12,14 +12,14 @@ Metadata:
     ReadmeUrl: ../README.md
     Labels: ['cloudfront', 'whitelist', 'securitygroup']
     HomePageUrl: https://github.com/coast-ch/cloudfront_security_group_update_ips
-    SemanticVersion: 0.0.1
+    SemanticVersion: 0.0.2
     SourceCodeUrl: https://github.com/coast-ch/cloudfront_security_group_update_ips
 
 Resources:
   CloudfrontLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: "Cloudfront_lambda_ips_whitelist_role"
+      RoleName: !Sub "Cloudfront_lambda_ips_whitelist_role_${AWS::Region}"
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -35,7 +35,7 @@ Resources:
     DependsOn: CloudfrontLambdaRole
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "Cloudfront_lambda_ips_whitelist"
+      PolicyName: !Sub "Cloudfront_lambda_ips_whitelist_${AWS::Region}"
       Roles:
         - !Ref CloudfrontLambdaRole
       PolicyDocument:
